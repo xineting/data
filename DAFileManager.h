@@ -40,6 +40,7 @@ public:
 
 private:
   std::string mainfilepath;
+  std::string outFilePath;
 
   struct FileIDHash {
     size_t operator()(clang::FileID fid) const { return fid.getHashValue(); }

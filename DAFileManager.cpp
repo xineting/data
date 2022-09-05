@@ -9,9 +9,13 @@
 #include "Util.h"
 
 DAFileManager::DAFileManager(std::string fpath) {
+
   mainfilepath = getAbsolutePath(fpath);
   std::cout << "mainfilepath:" + mainfilepath + "\n";
   assert(mainfilepath[0] == '/');
+
+
+
 }
 
 DAFileManager::~DAFileManager() {
@@ -75,7 +79,7 @@ void DAFileManager::finilize() {
   // assert(fileIDMap.size() == filePathMap.size());//delete!
   // llvm::errs() << "in fm final";
   std::ofstream jsonfile;
-  std::string jsonfilepath = mainfilepath + ".DA.json";
+  std::string jsonfilepath = mainfilepath;
   jsonfile.open(jsonfilepath, std::ios::out | std::ios::trunc);
   if (!jsonfile.good()) {
     llvm::outs() << "json file write fail" << jsonfilepath << "\n";
