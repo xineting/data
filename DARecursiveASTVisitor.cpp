@@ -257,6 +257,27 @@ void DARecursiveASTVisitor::RecordDeclRefExpr(clang::NamedDecl * d, clang::Sourc
   }
 
 bool DARecursiveASTVisitor::VisitStmt(clang::Stmt * st) {
+  if (clang::BinaryOperator *binaryOp = llvm::dyn_cast<clang::BinaryOperator>(st)){
+    if (binaryOp->isAssignmentOp()) {
+    clang::Expr *lhs = binaryOp->getLHS();
+    clang::Expr *rhs = binaryOp->getRHS();
+
+    if (clang::DeclRefExpr *left = llvm::dyn_cast<clang::DeclRefExpr>(lhs)) {
+      clang::ValueDecl *vd = left->getDecl();
+      if (vd) {
+        if (clang::VarDecl *var = llvm::dyn_cast<clang::VarDecl>(vd)) {
+          if (var->hasGlobalStorage() && var->getStorageClass() != SC_Static) {
+            vd_ctx = var;
+            vd_loc = vd_ctx->getBeginLoc();
+          }
+        }
+      }
+    }
+  }
+  }
+  else{
+    vd_ctx = nullptr;
+  }
   if (clang::CallExpr *call = llvm::dyn_cast<clang::CallExpr>(st)) {
       clang::FunctionDecl *func_decl = call->getDirectCallee();
       if (func_decl == nullptr) {
@@ -273,7 +294,7 @@ bool DARecursiveASTVisitor::VisitStmt(clang::Stmt * st) {
             call->getBeginLoc()
         );
     }
-    return true;
+  return true;
   }
 
 static inline bool isNamedDeclUnnamed(clang::NamedDecl * d) {
@@ -305,25 +326,6 @@ void DARecursiveASTVisitor::RecordDeclRef(clang::NamedDecl * d, clang::SourceLoc
     f_st->addRef(d, symbolType, refType, location);
   }
 
-bool DARecursiveASTVisitor::VisitBinaryOperator(clang::BinaryOperator * binaryOp) {
-    if (binaryOp->isAssignmentOp()) {
-      clang::Expr *lhs = binaryOp->getLHS();
-      clang::Expr *rhs = binaryOp->getRHS();
-      if (clang::DeclRefExpr *left = llvm::dyn_cast<clang::DeclRefExpr>(lhs)) {
-        clang::ValueDecl *vd = left->getDecl();
-        if (vd) {
-          if (clang::VarDecl *var = llvm::dyn_cast<clang::VarDecl>(vd)) {
-            if (var->hasGlobalStorage() &&
-                var->getStorageClass() != SC_Static) {
-              vd_ctx = var;
-              vd_loc = vd_ctx->getBeginLoc();
-            }
-          }
-        }
-      }
-    }
-    return true;
-  }
 
 void DARecursiveASTVisitor::RecordSymbolDep1(
       SDependencyType Sdt,

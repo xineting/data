@@ -59,9 +59,7 @@ private:
   bool VisitTypeLoc(clang::TypeLoc tl);
 
   bool VisitDecl(clang::Decl *d);
-
-  bool VisitBinaryOperator(clang::BinaryOperator *binaryOp);
-
+  
   void RecordSymbolDep1(
       SDependencyType Sdt,
       clang::NamedDecl * Sd,
