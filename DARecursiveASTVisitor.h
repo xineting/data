@@ -59,13 +59,13 @@ private:
   bool VisitTypeLoc(clang::TypeLoc tl);
 
   bool VisitDecl(clang::Decl *d);
-  
-  void RecordSymbolDep1(
-      SDependencyType Sdt,
-      clang::NamedDecl * Sd,
-      clang::NamedDecl * Ed,
-      clang::SourceLocation OcurrenceLoc
-      );
+
+  void recordBinaryOperatorDep(clang::ValueDecl *Vd, clang::Stmt *St,
+                               clang::SourceLocation Oloc);
+
+  void RecordSymbolDep1(SDependencyType Sdt, clang::NamedDecl *Sd,
+                        clang::NamedDecl *Ed,
+                        clang::SourceLocation OcurrenceLoc);
 };
 
 #endif // DA_RECURSIVEASTVISITOR_H
