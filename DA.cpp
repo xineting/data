@@ -14,16 +14,15 @@
 #include "clang/Tooling/Tooling.h"
 #include "llvm/Support/CommandLine.h"
 #include "clang/Driver/Job.h"
+#include "DAFileManager.h"
 
+DAFileManager *m_fm;
 
 static llvm::cl::OptionCategory MyToolCategory("my-tool options");
-
-std::string OutputFilePath;
 llvm::cl::opt<std::string> OutputFileName("o",
                                           llvm::cl::desc("Specify output filename"),
                                           llvm::cl::value_desc("filename"),
                                           llvm::cl::cat(MyToolCategory));
-
 
 int main(int argc, const char **argv) {
   auto ExpectedParser = tooling::CommonOptionsParser::create(
@@ -33,13 +32,19 @@ int main(int argc, const char **argv) {
     return 1;
   }
 
+  m_fm = new DAFileManager(OutputFileName);
+
+  std::unordered_map<std::string, SymbolTable *> filemap = m_fm->GetFilepathMap();
+
   clang::tooling::CommonOptionsParser& OptionsParser = ExpectedParser.get();
   std::vector<clang::tooling::CompileCommand> CompileCommandsForProject = OptionsParser.getCompilations().getAllCompileCommands();
   clang::tooling::ClangTool Tool(OptionsParser.getCompilations(),OptionsParser.getSourcePathList());
-  OutputFilePath = OutputFileName;
-
   Tool.appendArgumentsAdjuster(OptionsParser.getArgumentsAdjuster());//考虑extra-arg参数
-  Tool.run(clang::tooling::newFrontendActionFactory<DAASTFrontendAction>().get());
+  auto Factory = clang::tooling::newFrontendActionFactory<DAASTFrontendAction>();
+  llvm::outs()<<"step1";
+  Tool.run(Factory.get());
+  llvm::outs()<<"step2";
   llvm::llvm_shutdown();
+  m_fm->finilize();
   return 0;
 }
