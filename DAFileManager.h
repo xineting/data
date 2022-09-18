@@ -26,15 +26,15 @@ public:
   SymbolTable *
   getFileSymbolTable(clang::FileID fid); // internal,only in DAContext
   SymbolTable *
-  getFileSymbolTable(std::string filepath,
-                     clang::FileID fid); // internal,only in DAContext
-  SymbolTable *createFile(clang::FileID fid,
-                          std::string filepath); // internal,only in DAContext
+  getFileSymbolTable(std::string filepath, clang::FileID fid); // internal,only in DAContext
+  SymbolTable *createFile(clang::FileID fid, std::string filepath); // internal,only in DAContext
   SymbolTable *createFile(std::string filepath); // internal,only in DAContext
 
   std::string getFilePath(clang::FileID fid);
 
   std::string getMainFilePath() { return mainfilepath; }
+
+  std::unordered_map<std::string, SymbolTable *> GetFilepathMap();
 
   void finilize();
 
