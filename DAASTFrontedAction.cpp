@@ -5,45 +5,23 @@
 =================================================*/
 
 #include "DAASTFrontedAction.h"
+#include "iostream"
 
-extern std::string OutputFilePath;
-
-DAASTFrontendAction::~DAASTFrontendAction() { m_fm->finilize(); }
-std::unique_ptr<clang::ASTConsumer>
-DAASTFrontendAction::CreateASTConsumer(clang::CompilerInstance &Compiler,
-                                       llvm::StringRef InFile) {
-  return std::make_unique<DAASTConsumer>(getContext(Compiler));
+DAASTFrontendAction::~DAASTFrontendAction() {
 }
 
-/**
- * 获取Context，只不过是把Context变成了自己定义的Context了
- * DAContext可以getFileSymbolTable
- * 也就是通过Contect获取代码中的所有的符号表
- * 这里感觉并不是很有必要，会导致代码的可读性变差
- * @param ci
- * @return
- */
-
 DAContext *DAASTFrontendAction::getContext(clang::CompilerInstance &ci) {
-  std::string mainfilepath;
   if (m_context == nullptr) {
-    if(!OutputFilePath.empty()){
-      mainfilepath = OutputFilePath;
-    }else{
-      mainfilepath =
-          ci.getSourceManager()
-              .getFileEntryForID(ci.getSourceManager().getMainFileID())
-              ->getName()
-              .str();
-      mainfilepath += ".DA.json";
-    }
-    m_fm = new DAFileManager(mainfilepath);
-
-    assert(m_fm != nullptr);
-    m_context =
-        new DAContext(ci.getSourceManager(), ci.getPreprocessor(), m_fm);
+    m_context = new DAContext(ci.getSourceManager(), ci.getPreprocessor());
   }
   return m_context;
+}
+
+std::unique_ptr<clang::ASTConsumer> DAASTFrontendAction::CreateASTConsumer
+    (clang::CompilerInstance &Compiler,llvm::StringRef InFile) {
+  DAContext *mc = nullptr;
+  mc = getContext(Compiler);
+  return std::make_unique<DAASTConsumer>(mc);
 }
 
 bool DAASTFrontendAction::BeginSourceFileAction(clang::CompilerInstance &ci) {
@@ -53,7 +31,12 @@ bool DAASTFrontendAction::BeginSourceFileAction(clang::CompilerInstance &ci) {
    * 解析宏定义的语句很复杂
    *目前还没有研究透彻
    */
-  ci.getPreprocessor().addPPCallbacks(std::unique_ptr<clang::PPCallbacks>(new DAPPCallbacks(getContext(ci))));
+  DAContext *mc = nullptr;
+  mc = getContext(ci);
+  ci.getPreprocessor().addPPCallbacks(
+      std::unique_ptr<clang::PPCallbacks>
+          (new DAPPCallbacks(mc)
+      ));
 //ci.getPreprocessor().addCommentHandler(preprocessor_consumer);//TODO
   return true;
 }
