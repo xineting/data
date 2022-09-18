@@ -15,20 +15,19 @@
 class DAContext {
 public:
   DAContext(clang::SourceManager &sourceManager,
-            clang::Preprocessor &preprocessor, DAFileManager *fileManager)
-      : m_sourceManager(sourceManager), m_preprocessor(preprocessor),
-        m_fm(fileManager) {}
+            clang::Preprocessor &preprocessor)
+      : m_sourceManager(sourceManager),
+        m_preprocessor(preprocessor){}
 
   SymbolTable *getFileSymbolTable(clang::FileID fid);
 
   clang::SourceManager &sourceManager() { return m_sourceManager; }
   clang::Preprocessor &preprocessor() { return m_preprocessor; }
-  DAFileManager *fileManager() { return m_fm; }
   char *GetFileName(clang::FileID fid);
+
 private:
   clang::SourceManager &m_sourceManager;
   clang::Preprocessor &m_preprocessor;
-  DAFileManager *m_fm;
 };
 
 #endif // DA_CONTEXT_H
