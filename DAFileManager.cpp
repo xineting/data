@@ -9,13 +9,9 @@
 #include "Util.h"
 
 DAFileManager::DAFileManager(std::string fpath) {
-
   mainfilepath = getAbsolutePath(fpath);
   std::cout << "mainfilepath:" + mainfilepath + "\n";
   assert(mainfilepath[0] == '/');
-
-
-
 }
 
 DAFileManager::~DAFileManager() {
@@ -32,8 +28,7 @@ SymbolTable *DAFileManager::getFileSymbolTable(clang::FileID fid) {
     return nullptr;
 }
 
-SymbolTable *DAFileManager::getFileSymbolTable(std::string filepath,
-                                               clang::FileID fid) {
+SymbolTable *DAFileManager::getFileSymbolTable(std::string filepath, clang::FileID fid) {
   std::unordered_map<std::string, SymbolTable *>::iterator iter =
       filePathMap.find(filepath);
   if (iter != filePathMap.end()) {
@@ -75,17 +70,15 @@ std::string DAFileManager::getFilePath(clang::FileID fid) {
   return st->getSymbolTableFilePath();
 }
 
+std::unordered_map<std::string, SymbolTable *> DAFileManager::GetFilepathMap(){
+  return filePathMap;
+}
+
+
 void DAFileManager::finilize() {
-  // assert(fileIDMap.size() == filePathMap.size());//delete!
-  // llvm::errs() << "in fm final";
   std::ofstream jsonfile;
   std::string jsonfilepath = mainfilepath;
   jsonfile.open(jsonfilepath, std::ios::out | std::ios::trunc);
-  if (!jsonfile.good()) {
-    llvm::outs() << "json file write fail" << jsonfilepath << "\n";
-    exit(1);
-  }
-
   jsonfile << "{" << std::endl;
   bool begin = true;
   for (const auto &iter : filePathMap) {
