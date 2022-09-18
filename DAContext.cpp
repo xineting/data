@@ -10,6 +10,7 @@
 /*
  * 获取文件名的操作可以写成一个函数。
  */
+extern DAFileManager *m_fm;
 
 char *DAContext::GetFileName(clang::FileID fid) {
   const clang::FileEntry *fe = m_sourceManager.getFileEntryForID(fid);
@@ -46,15 +47,11 @@ SymbolTable *DAContext::getFileSymbolTable(clang::FileID fid) {
   }
 
   trim(filepath);
-
   if (filepath.empty())
     filepath += "<blank>"; // FIXME
-
   ret_st = m_fm->getFileSymbolTable(filepath, fid);
-
   if (ret_st != nullptr)
     return ret_st;
-
   ret_st = m_fm->createFile(fid, filepath);
 
   if (ret_st != nullptr)
