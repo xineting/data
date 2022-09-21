@@ -22,7 +22,6 @@ class DAASTFrontendAction : public clang::ASTFrontendAction {
 
 public:
   ~DAASTFrontendAction();
-  bool BeginSourceFileAction(clang::CompilerInstance &ci);
   std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile);
   DAContext *getContext(clang::CompilerInstance &ci);
 

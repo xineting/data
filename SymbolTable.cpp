@@ -344,7 +344,11 @@ SymbolTable::~SymbolTable() {
     delete itr;
 }
 
-void SymbolTable::finilize(std::string jsonfilepath, DAFileManager *fm) {
+std::vector<SDependency *> SymbolTable::getSymbolDependency(){
+  return symbolDependencyTable;
+}
+
+void SymbolTable::Out2File(std::string jsonfilepath, DAFileManager *fm) {
 
   std::ofstream log;
   log.open(jsonfilepath, std::ios::out | std::ios::app);
@@ -511,9 +515,6 @@ void SymbolTable::finilize(std::string jsonfilepath, DAFileManager *fm) {
   }
 
   log << "]" << std::endl;
-  // llvm::errs()<<"dump reftable ok!\n";
-
   log.flush();
   log.close();
-  // llvm::errs() << "symboltable finalize ok\n";
 }

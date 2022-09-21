@@ -19,42 +19,39 @@
 #include "DASignatureGenerator.h"
 #include "DAType.h"
 #include "clang/Tooling/Tooling.h"
+struct Ref {
+  unsigned sid;
+  // unsigned fid;
+  RefType rt;
+  std::string loc;
+};
+struct SDependency {
+  SDependencyType sdt;
+
+  unsigned ssid;
+  unsigned esid;
+
+  clang::FileID sfid;
+  clang::FileID efid;
+
+
+  std::string sloc;
+  std::string eloc;
+
+  clang::FileID Occurrencefid;
+  std::string oloc;
+};
+
+struct Symbol {
+  std::string signature;
+  SymbolType st;
+  std::string name;
+};
 
 class DAFileManager;
 
 class SymbolTable {
 public:
-  struct Symbol {
-    std::string signature;
-    SymbolType st;
-    std::string name;
-  };
-
-  struct Ref {
-    unsigned sid;
-    // unsigned fid;
-    RefType rt;
-    std::string loc;
-  };
-
-  // start symbol must in current FileManager's file
-  struct SDependency {
-    SDependencyType sdt;
-
-    unsigned ssid;
-    unsigned esid;
-
-    clang::FileID sfid;
-    clang::FileID efid;
-
-
-    std::string sloc;
-    std::string eloc;
-
-    clang::FileID Occurrencefid;
-    std::string oloc;
-  };
-
   SymbolTable(std::string filepath) : this_filepath(filepath) {}
 
   ~SymbolTable();
@@ -67,6 +64,8 @@ public:
   void addRef(std::string signature, SymbolType st, RefType rt,
               std::string location);
 
+  std::vector<SDependency *> getSymbolDependency();
+
   void addSymbolDependency(SDependencyType Sdt,
                            unsigned Ssid,
                            unsigned Esid,
@@ -77,24 +76,27 @@ public:
                            clang::FileID Ofid,
                            std::string Olocstring);
 
-  void finilize(std::string jsonfilepath, DAFileManager *fm);
+  void Out2File(std::string jsonfilepath, DAFileManager *fm);
 
   // AST symbol use, when adding symbol dep
   unsigned getSymbolID(clang::NamedDecl *nd);
 
-  std::string getSymbolTableFilePath() { return this_filepath; }
+  std::string getSymbolTableFilePath() {
+    return this_filepath;
+  }
 
-private:
   Symbol *getSymbol(unsigned sid) {
     int index = sid - 1;
     int n = size();
     if (index >= n) {
-      llvm::errs() << "INTERNAL ERROR! invalid sid@" << sid << "\n";
-      exit(1);
+      return nullptr;
     }
 
     return symbolTable[index];
   }
+
+private:
+
 
   // AST symbol use
   unsigned getSymbolID(clang::NamedDecl *nd, SymbolType st);

@@ -19,35 +19,27 @@
 
 class SymbolTable;
 
+struct FileIDHash {
+  size_t operator()(clang::FileID fid) const { return fid.getHashValue(); }
+};
+
 class DAFileManager {
 public:
-  explicit DAFileManager(std::string fpath);
+  explicit DAFileManager();
   ~DAFileManager();
   SymbolTable *
   getFileSymbolTable(clang::FileID fid); // internal,only in DAContext
   SymbolTable *
   getFileSymbolTable(std::string filepath, clang::FileID fid); // internal,only in DAContext
   SymbolTable *createFile(clang::FileID fid, std::string filepath); // internal,only in DAContext
-  SymbolTable *createFile(std::string filepath); // internal,only in DAContext
-
   std::string getFilePath(clang::FileID fid);
-
-  std::string getMainFilePath() { return mainfilepath; }
-
   std::unordered_map<std::string, SymbolTable *> GetFilepathMap();
-
-  void finilize();
+  std::unordered_map<clang::FileID, SymbolTable *, FileIDHash> GetFileIDMap();
+  void Out2File(std::string OutputFileName);
 
 private:
-  std::string mainfilepath;
-  std::string outFilePath;
 
-  struct FileIDHash {
-    size_t operator()(clang::FileID fid) const { return fid.getHashValue(); }
-  };
-
-  std::unordered_map<clang::FileID, SymbolTable *, FileIDHash>
-      fileIDMap; // clang fid
+  std::unordered_map<clang::FileID, SymbolTable *, FileIDHash> fileIDMap; // clang fid
   std::unordered_map<std::string, SymbolTable *>
       filePathMap; // file absolute path
 };

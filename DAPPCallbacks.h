@@ -4,6 +4,11 @@
  *	06/01/2022 pyx : Edited.                     *
 =================================================*/
 
+
+#ifndef DA_PPCALLBACK_H
+#define DA_PPCALLBACK_H
+
+
 #include "DAContext.h"
 #include "DAFileManager.h"
 #include "SymbolTable.h"
@@ -48,3 +53,6 @@ private:
 
   DAContext *Context;
 };
+
+
+#endif

@@ -4,11 +4,11 @@
  *	03/04/2021 pyx : Edited.                     *
 =================================================*/
 
-#include "DAASTConsumer.h"
 
+#include "DAASTConsumer.h"
 using namespace clang;
 DAASTConsumer::DAASTConsumer(DAContext *Context) : m_context(Context), Visitor(Context) {
-  assert(this->m_context != nullptr);
+
 }
 
 void DAASTConsumer::HandleTranslationUnit(clang::ASTContext &Context) {

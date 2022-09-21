@@ -37,9 +37,9 @@ enum SDependencyType : int {
   SDT_RetType_Function,//function -> return type
   SDT_ParamType_Function,//function -> params type
   SDT_Typedef_GlobalVar,//GlobalVar -> Typedef type
-  SDT_FieldType_Typedef,//Typedef -> Field
-  SDT_Typedef_Typedef,//Typedef->Typedef
-  SDT_GlobalVar_GlobalVar, // not static var,TODO:gv1 = (gv2 = gv3+b)?is it
+  SDT_FieldType_Tag,//Tag -> Field
+  SDT_Tag_Typedef,//Typedef->Tag
+  SDT_GlobalVar_GlobalVar, // not static var
   SDT_GlobalVar_Function, // function needs gv, because func call uses a gv as
   SDT_Max
 };

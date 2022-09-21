@@ -43,14 +43,12 @@ private:
   clang::SourceLocation fd_loc;
 
   clang::SourceLocation vd_loc;
-  //  bool TraverseNestedNameSpecifierLoc(clang::NestedNameSpecifierLoc
-  //  qualifier); bool TraverseBinAssign(clang::BinaryOperator *binaryOp);
+
   bool VisitMemberExpr(clang::MemberExpr *e);
 
   bool VisitDeclRefExpr(clang::DeclRefExpr *e);
 
   bool VisitStmt(clang::Stmt *st);
-  //  bool VisitDecl(clang::Decl *d);
 
   void RecordDeclRefExpr(clang::NamedDecl *d, clang::SourceLocation loc);
 

@@ -69,7 +69,8 @@ bool DARecursiveASTVisitor::VisitDecl(clang::Decl *d) {
     if (clang::FunctionDecl *fd = llvm::dyn_cast<clang::FunctionDecl>(d)) {
       if (fd->getTemplateInstantiationPattern() != NULL) {
         // 这里是为了获取fd_ctx，为了获取函数下引用的全局变量符号。
-      } else {
+      }
+      else {
         fd_ctx = fd;
         SourceManager &sm = m_context->sourceManager();
         clang::SourceLocation spellingloc = sm.getSpellingLoc(loc);
@@ -83,10 +84,11 @@ bool DARecursiveASTVisitor::VisitDecl(clang::Decl *d) {
         TypeDecl *td = GetTypeDecl(QT);
 
         if (td != nullptr) {
-          RecordSymbolDep1(SDT_RetType_Function, fd_ctx, td, td->getBeginLoc());
+          RecordSymbolDep1(SDT_RetType_Function, fd_ctx, td, fd_ctx->getBeginLoc());
         }
       }
-    } else {
+    }
+    else {
       const bool IsParam = llvm::isa<clang::ParmVarDecl>(d);
       if (!d->getParentFunctionOrMethod() && !IsParam) {
         fd_ctx = nullptr;
@@ -115,12 +117,8 @@ bool DARecursiveASTVisitor::VisitDecl(clang::Decl *d) {
                   td = typedefType->getDecl();
                 }
               }
-              FunctionDecl *fd = llvm::dyn_cast_or_null<clang::FunctionDecl>(
-                  d->getDeclContext());
-              if (fd && !fd->isThisDeclarationADefinition()) {
-                omitParamVar = true;
-              }
-              if (!omitParamVar) {
+
+              if (llvm::dyn_cast_or_null<FunctionDecl>(d->getParentFunctionOrMethod())) {
                 RefType refType;
                 if (vd->isThisDeclarationADefinition() ==
                     clang::VarDecl::DeclarationOnly) {
@@ -131,7 +129,7 @@ bool DARecursiveASTVisitor::VisitDecl(clang::Decl *d) {
                 RecordDeclRef(nd, loc, refType, ST_Parameter);
                 if (td != nullptr) {
                   RecordSymbolDep1(SDT_ParamType_Function, fd_ctx, td,
-                                   td->getBeginLoc());
+                                   fd_ctx->getBeginLoc());
                 }
               }
             }
@@ -154,7 +152,8 @@ bool DARecursiveASTVisitor::VisitDecl(clang::Decl *d) {
             RecordSymbolDep1(SDT_Typedef_GlobalVar, vd, td, vd->getBeginLoc());
           }
         }
-      } else if (clang::TagDecl *td = llvm::dyn_cast<clang::TagDecl>(d)) {
+      } else if (clang::TagDecl *td = llvm::dyn_cast<clang::TagDecl>(d))
+      {
         RefType refType =
             td->isThisDeclarationADefinition() ? RT_Definition : RT_Declaration;
         SymbolType symbolType = ST_Max;
@@ -181,7 +180,7 @@ bool DARecursiveASTVisitor::VisitDecl(clang::Decl *d) {
         if (td != nullptr) {
           clang::RecordDecl *rd = fd->getParent();
           if (rd) {
-            RecordSymbolDep1(SDT_FieldType_Typedef, rd, td, td->getBeginLoc());
+            RecordSymbolDep1(SDT_FieldType_Tag, rd, td, fd->getBeginLoc());
           }
         }
       } else if (clang::TypedefNameDecl *tdd =
@@ -190,9 +189,9 @@ bool DARecursiveASTVisitor::VisitDecl(clang::Decl *d) {
         QualType QT = tdd->getUnderlyingType();
         TypeDecl *td = nullptr;
         td = GetTypeDecl(QT);
-        if (td != nullptr) {
 
-          RecordSymbolDep1(SDT_Typedef_Typedef, tdd, td, tdd->getBeginLoc());
+        if (td != nullptr) {
+          RecordSymbolDep1(SDT_Tag_Typedef, tdd, td, tdd->getBeginLoc());
         }
       } else if (llvm::isa<clang::EnumConstantDecl>(d)) {
         RecordDeclRef(nd, loc, RT_Declaration, ST_Enumerator);
@@ -235,7 +234,8 @@ void DARecursiveASTVisitor::recordBinaryOperatorDep(clang::ValueDecl *Vd,clang::
         }
       }
     }
-  }else{
+  }
+  else{
     if (clang::BinaryOperator *BinaryOp = llvm::dyn_cast<clang::BinaryOperator>(St)){
       clang::Expr *Lhs = BinaryOp->getLHS();
       clang::Expr *Rhs = BinaryOp->getRHS();
@@ -258,7 +258,6 @@ bool DARecursiveASTVisitor::VisitStmt(clang::Stmt *st) {
       clang::SourceLocation Oloc = st->getBeginLoc();
       clang::Expr *lhs = binaryOp->getLHS();
       clang::Expr *rhs = binaryOp->getRHS();
-
       if (clang::DeclRefExpr *left = llvm::dyn_cast<clang::DeclRefExpr>(lhs)) {
         clang::ValueDecl *vd = left->getDecl();
         if (vd) {

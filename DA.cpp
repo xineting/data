@@ -17,7 +17,6 @@
 #include "DAFileManager.h"
 
 DAFileManager *m_fm;
-
 static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 llvm::cl::opt<std::string> OutputFileName("o",
                                           llvm::cl::desc("Specify output filename"),
@@ -32,19 +31,15 @@ int main(int argc, const char **argv) {
     return 1;
   }
 
-  m_fm = new DAFileManager(OutputFileName);
-
-  std::unordered_map<std::string, SymbolTable *> filemap = m_fm->GetFilepathMap();
+  m_fm = new DAFileManager();
 
   clang::tooling::CommonOptionsParser& OptionsParser = ExpectedParser.get();
   std::vector<clang::tooling::CompileCommand> CompileCommandsForProject = OptionsParser.getCompilations().getAllCompileCommands();
   clang::tooling::ClangTool Tool(OptionsParser.getCompilations(),OptionsParser.getSourcePathList());
   Tool.appendArgumentsAdjuster(OptionsParser.getArgumentsAdjuster());//考虑extra-arg参数
-  auto Factory = clang::tooling::newFrontendActionFactory<DAASTFrontendAction>();
-  llvm::outs()<<"step1";
-  Tool.run(Factory.get());
-  llvm::outs()<<"step2";
+  Tool.run(clang::tooling::newFrontendActionFactory<DAASTFrontendAction>().get());
+
+  m_fm->Out2File(OutputFileName);
   llvm::llvm_shutdown();
-  m_fm->finilize();
   return 0;
 }

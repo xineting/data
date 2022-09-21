@@ -4,6 +4,11 @@
   *	03/04/2021 pyx : Edited.                     *
 =================================================*/
 
+#ifndef DAASTConsumer_H
+#define DAASTConsumer_H
+
+
+
 #include "DAContext.h"
 
 #include <assert.h>
@@ -22,6 +27,8 @@ public:
   virtual void HandleTranslationUnit(clang::ASTContext &Context);
 
 private:
-  DAContext *m_context;
+  DAContext *m_context = nullptr;
   DARecursiveASTVisitor Visitor;
 };
+
+#endif
