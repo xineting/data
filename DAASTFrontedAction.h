@@ -24,7 +24,7 @@ public:
   ~DAASTFrontendAction();
   std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile);
   DAContext *getContext(clang::CompilerInstance &ci);
-
+  bool BeginSourceFileAction(clang::CompilerInstance &ci);
   DAContext *m_context = nullptr;
 
 };

@@ -41,5 +41,6 @@ int main(int argc, const char **argv) {
 
   m_fm->Out2File(OutputFileName);
   llvm::llvm_shutdown();
+  llvm::outs()<<"finish\n";
   return 0;
 }

@@ -23,4 +23,11 @@ std::unique_ptr<clang::ASTConsumer> DAASTFrontendAction::CreateASTConsumer
   auto tmp1 = new DAASTConsumer(tmp);
   return std::make_unique<DAASTConsumer>(tmp);
 }
+bool DAASTFrontendAction::BeginSourceFileAction(clang::CompilerInstance &ci) {
+  ci.getDiagnostics().setClient(new clang::IgnoringDiagConsumer);
+  DAContext *mc = nullptr;
+  mc = getContext(ci);
+  ci.getPreprocessor().addPPCallbacks(std::unique_ptr<clang::PPCallbacks>(new DAPPCallbacks(mc)));
+  return true;
 
+}
