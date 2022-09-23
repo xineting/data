@@ -10,61 +10,60 @@ DAPPCallbacks::DAPPCallbacks(DAContext *Context) : Context(Context) {
   assert(this->Context != nullptr);
 }
 
+/*
 void DAPPCallbacks::InclusionDirective(
     clang::SourceLocation hashLoc, const clang::Token &includeTok,
     llvm::StringRef fileName, bool isAngled,
     clang::CharSourceRange filenameRange, const clang::FileEntry *file,
     llvm::StringRef searchPath, llvm::StringRef relativePath,
-    const clang::Module *imported, SrcMgr::CharacteristicKind FileType) {
+    const clang::Module *imported, SrcMgr::CharacteristicKind FileType)
+    */
 
-  if (file == NULL) {
+void DAPPCallbacks::InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
+                        StringRef FileName, bool IsAngled,
+                        CharSourceRange FilenameRange,
+                        Optional<FileEntryRef> File, StringRef SearchPath,
+                        StringRef RelativePath, const Module *Imported,
+                         SrcMgr::CharacteristicKind FileType)
+
+{
+  if (!File.hasValue()) {
     return;
   }
-
   clang::SourceManager &sm = Context->sourceManager();
-
   clang::SourceLocation spellingLoc =
-      sm.getSpellingLoc(filenameRange.getBegin());
-
+      sm.getSpellingLoc(FilenameRange.getBegin());
   if (!spellingLoc.isValid()) {
     llvm::errs() << "include spelling loc invalid\n";
-    // exit(1);
     return;
   }
-
-  clang::FileID refFileID = sm.getFileID(spellingLoc);
-
-  std::string location = "";
-
-  unsigned int offset = sm.getFileOffset(spellingLoc);
-  location += std::to_string(sm.getLineNumber(refFileID, offset));
-  location += ",";
-  location += std::to_string(sm.getColumnNumber(refFileID, offset));
-
-  std::string symbol = "@";
-  llvm::StringRef fname = file->getName();
-  char *path = realpath(fname.data(), NULL); // FIXME: only work in linux os
-  if (path != NULL) {
-    symbol += path;
-    free(path);
+  clang::FileID RefFileId = sm.getFileID(spellingLoc);
+  std::string Location = "";
+  unsigned int Offset = sm.getFileOffset(spellingLoc);
+  Location += std::to_string(sm.getLineNumber(RefFileId, Offset));
+  Location += ",";
+  Location += std::to_string(sm.getColumnNumber(RefFileId, Offset));
+  std::string Symbol = "@";
+  llvm::StringRef Fname = File->getName();
+  char *Path;
+  Path = realpath(Fname.data(), NULL); // FIXME: only work in linux os
+  if (Path != NULL) {
+    Symbol += Path;
+    free(Path);
   }
-  if (symbol.size() == 1)
-    symbol += "<blank>"; // FIXME
-
-  recordMacro(symbol, refFileID, ST_Path, RT_Included, location);
+  if (Symbol.size() == 1)
+    Symbol += "<blank>"; // FIXME
+  recordMacro(Symbol, RefFileId, ST_Path, RT_Included, Location);
 }
 
 // inner function,USE EXCEPT INCLUDE!
-void DAPPCallbacks::recordMacro(std::string symbolname, clang::FileID FileID,
-                                SymbolType st, RefType rt,
-                                std::string location) {
-  assert(!symbolname.empty());
-  assert(!location.empty());
-
-  SymbolTable *f_st = Context->getFileSymbolTable(FileID);
-
-  f_st->addRef(symbolname, st, rt, location);
-
+void DAPPCallbacks::recordMacro(std::string Symbolname, clang::FileID FileID,
+                                SymbolType St, RefType Rt,
+                                std::string Location) {
+  assert(!Symbolname.empty());
+  assert(!Location.empty());
+  SymbolTable *FSt = Context->getFileSymbolTable(FileID);
+  FSt->addRef(Symbolname, St, Rt, Location);
   return;
 }
 
