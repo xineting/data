@@ -1,1 +1,1 @@
-posixwait signalinterupt filename makecommand makecmd builtin reeadlineandoutput rlcall
+posix wait signal interupt file name make command make cmd readline call
